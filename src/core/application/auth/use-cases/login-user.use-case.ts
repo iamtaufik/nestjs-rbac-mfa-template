@@ -49,7 +49,10 @@ export class LoginUserUseCase {
 
     const activeMfaCount = await this.mfaFactorRepo.count({
       where: {
-        id: user.id,
+        user: {
+          id: user.id,
+        },
+        factorType: 'TOTP',
         isActive: true,
       },
     });
@@ -58,28 +61,15 @@ export class LoginUserUseCase {
 
     const jwtPayload = {
       sub: user.id,
-      usrnm: user.username,
-      emadr: user.email,
-      // roles, permissions bisa ditambah nanti
     };
 
-    const accessToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: '15m',
-    });
-
-    const refreshToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: '20m',
+    const mfaTicket = await this.jwtService.signAsync(jwtPayload, {
+      expiresIn: '5m',
     });
 
     const response: LoginResponseDto = {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        usrnm: user.username,
-        emadr: user.email,
-      },
       mfaRequired,
+      mfaTicket,
     };
 
     return response;

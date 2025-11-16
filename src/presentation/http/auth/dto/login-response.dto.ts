@@ -16,25 +16,17 @@ class LoginUserDto {
 
 export class LoginResponseDto {
   @ApiProperty({
-    description: 'JWT access token',
+    description: 'MFA Ticket"',
+    example: 'mfa-ticket-xyz-123',
+    required: true,
   })
-  accessToken: string;
-
-  @ApiProperty({
-    description: 'JWT refresh token',
-  })
-  refreshToken: string;
-
-  @ApiProperty({
-    type: LoginUserDto,
-  })
-  user: LoginUserDto;
+  mfaTicket: string;
 
   @ApiProperty({
     description:
       'True kalau user punya MFA aktif dan masih perlu verifikasi MFA di step berikutnya',
     example: false,
-    required: false,
+    required: true,
   })
-  mfaRequired?: boolean;
+  mfaRequired: boolean;
 }

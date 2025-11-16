@@ -4,17 +4,22 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { MfaSetupRequestDto } from './dto/mfa-setup-request.dto';
+import { MfaVerifyRequestDto } from './dto/mfa-verify-request.dto';
 import { BaseResponseDto } from '../dto/common/base-response.dto';
 import { ApiResponseOf } from '../dto/common/api-response.dto';
 
-import { RegisterUserUseCase } from 'src/core/application/auth/use-case/register-user.use-case';
-import { LoginUserUseCase } from 'src/core/application/auth/use-case/login-user.use-case';
+import { RegisterUserUseCase } from 'src/core/application/auth/use-cases/register-user.use-case';
+import { LoginUserUseCase } from 'src/core/application/auth/use-cases/login-user.use-case';
+import { MfaSetupUseCase } from 'src/core/application/auth/use-cases/mfa-setup.use-case';
+import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify.use-case';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -22,6 +27,8 @@ export class AuthController {
   constructor(
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly mfaSetupUseCase: MfaSetupUseCase,
+    private readonly mfaVerifyUseCase: MfaVerifyUseCase,
   ) {}
 
   @Post('register')
@@ -59,6 +66,26 @@ export class AuthController {
     return {
       message: 'Success login',
       data: result,
+    };
+  }
+
+  @Post('mfa/setup')
+  async setup(@Body() body: MfaSetupRequestDto) {
+    const data = await this.mfaSetupUseCase.execute(body.userId);
+    return {
+      message: 'Scan QR Code to setup MFA',
+      data,
+    };
+  }
+
+  @Post('mfa/verify')
+  // Add bearer auth
+  @ApiBearerAuth('mfa-ticket')
+  async verify(@Body() body: MfaVerifyRequestDto) {
+    await this.mfaVerifyUseCase.execute(body.userId, body.token);
+    return {
+      message: 'MFA successfully enabled',
+      data: null,
     };
   }
 }

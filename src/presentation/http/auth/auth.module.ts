@@ -9,8 +9,10 @@ import { UserTypeOrmRepository } from 'src/infrastructure/database/repositories/
 import { UserOrmEntity } from 'src/infrastructure/database/entities/user.orm-entity';
 import { MfaFactorOrmEntity } from 'src/infrastructure/database/entities/mfa-factor.orm-entity';
 
-import { RegisterUserUseCase } from 'src/core/application/auth/use-case/register-user.use-case';
-import { LoginUserUseCase } from 'src/core/application/auth/use-case/login-user.use-case';
+import { RegisterUserUseCase } from 'src/core/application/auth/use-cases/register-user.use-case';
+import { LoginUserUseCase } from 'src/core/application/auth/use-cases/login-user.use-case';
+import { MfaSetupUseCase } from 'src/core/application/auth/use-cases/mfa-setup.use-case';
+import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify.use-case';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { LoginUserUseCase } from 'src/core/application/auth/use-case/login-user.
   providers: [
     RegisterUserUseCase,
     LoginUserUseCase,
+    MfaSetupUseCase,
+    MfaVerifyUseCase,
     {
       provide: UserRepositoryToken,
       useClass: UserTypeOrmRepository,
