@@ -24,14 +24,6 @@ export class MfaVerifyUseCase {
     });
 
     if (!mfa) throw new UnauthorizedException('MFA not setup');
-    console.log('data', {
-      secret: mfa.secretKey,
-      token,
-    });
-
-    console.log('Server Time:', Date.now());
-    console.log('Local Time:', new Date().toISOString());
-    console.log('Client Time (cek HP):', 'cek apakah sama?');
 
     const isValid = authenticator.verify({
       secret: mfa.secretKey,

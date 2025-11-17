@@ -9,17 +9,20 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Minimal RBAC Authentication')
-    .setDescription('API documentation for Auth + RBAC + MFA')
-    .setVersion('1.0.0')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
       },
-      'access-token', // nama scheme (bebas, tapi harus konsisten)
+      'mfa-ticket',
     )
+    .setTitle('Minimal RBAC Authentication')
+    .setDescription('API documentation for Auth + RBAC + MFA')
+    .setVersion('1.0.0')
     .build();
 
   app.setGlobalPrefix('api');

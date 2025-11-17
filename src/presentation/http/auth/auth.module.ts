@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { jwtConstant } from 'src/utils/constant';
+
 import { AuthController } from './auth.controller';
 
 import { UserRepositoryToken } from 'src/core/domain/user/user.repository';
@@ -18,7 +20,7 @@ import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify
   imports: [
     TypeOrmModule.forFeature([UserOrmEntity, MfaFactorOrmEntity]),
     JwtModule.register({
-      secret: 'must be secret',
+      secret: jwtConstant.secret,
     }),
   ],
   controllers: [AuthController],

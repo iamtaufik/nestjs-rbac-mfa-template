@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -6,6 +14,8 @@ import {
   ApiCreatedResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+
+import { AuthGuard } from './auth.guard';
 
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
@@ -35,11 +45,12 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
   @ApiCreatedResponse({
-    type: BaseResponseDto<RegisterResponseDto>,
+    type: ApiResponseOf(RegisterResponseDto),
   })
   async register(
     @Body() dto: RegisterRequestDto,
   ): Promise<BaseResponseDto<RegisterResponseDto>> {
+    console.log(dto);
     const result = await this.registerUserUseCase.execute({
       username: dto.username,
       email: dto.email,
@@ -69,20 +80,22 @@ export class AuthController {
     };
   }
 
+  @UseGuards(AuthGuard)
   @Post('mfa/setup')
-  async setup(@Body() body: MfaSetupRequestDto) {
-    const data = await this.mfaSetupUseCase.execute(body.userId);
+  @ApiBearerAuth('mfa-ticket')
+  async setup(@Request() request) {
+    const data = await this.mfaSetupUseCase.execute(request.user.id);
     return {
       message: 'Scan QR Code to setup MFA',
       data,
     };
   }
 
+  @UseGuards(AuthGuard)
   @Post('mfa/verify')
-  // Add bearer auth
   @ApiBearerAuth('mfa-ticket')
-  async verify(@Body() body: MfaVerifyRequestDto) {
-    await this.mfaVerifyUseCase.execute(body.userId, body.token);
+  async verify(@Body() body: MfaVerifyRequestDto, @Request() request) {
+    await this.mfaVerifyUseCase.execute(request.user.id, body.token);
     return {
       message: 'MFA successfully enabled',
       data: null,
