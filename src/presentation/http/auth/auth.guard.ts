@@ -7,10 +7,18 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstant } from 'src/utils/constant';
 import type { Request } from 'express';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserOrmEntity } from 'src/infrastructure/database/entities/user.orm-entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    @InjectRepository(UserOrmEntity)
+    private readonly userRepo: Repository<UserOrmEntity>,
+
+    private jwtService: JwtService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -23,7 +31,16 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstant.secret,
       });
-      request['user'] = payload;
+      const user = await this.userRepo.findOneBy({ id: payload.sub });
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      request['user'] = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      };
     } catch {
       throw new UnauthorizedException();
     }

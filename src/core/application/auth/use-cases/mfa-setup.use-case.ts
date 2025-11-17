@@ -33,8 +33,6 @@ export class MfaSetupUseCase {
       },
     });
 
-    console.log('username', user?.username);
-
     if (!user) throw new NotFoundException('User not found');
 
     const secret = authenticator.generateSecret();
@@ -50,7 +48,7 @@ export class MfaSetupUseCase {
           id: user.id,
         },
         factorType: 'TOTP',
-        isActive: true,
+        isPrimary: true,
       },
     });
 

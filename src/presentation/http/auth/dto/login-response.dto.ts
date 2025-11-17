@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-
+import { IsString, IsNotEmpty } from 'class-validator';
 class LoginUserDto {
   @ApiProperty({ example: 'f0c91b8a-5e3b-4d0f-9d2a-5f22e4b3f111' })
   id: string;

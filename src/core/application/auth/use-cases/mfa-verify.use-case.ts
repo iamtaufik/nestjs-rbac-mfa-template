@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { authenticator } from 'otplib';
+import { JwtService } from '@nestjs/jwt';
 
 import { MfaFactorOrmEntity } from 'src/infrastructure/database/entities/mfa-factor.orm-entity';
 
@@ -10,6 +11,8 @@ export class MfaVerifyUseCase {
   constructor(
     @InjectRepository(MfaFactorOrmEntity)
     private readonly mfaRepo: Repository<MfaFactorOrmEntity>,
+
+    private readonly jwtService: JwtService,
   ) {}
 
   async execute(userId: string, token: string) {
@@ -30,14 +33,25 @@ export class MfaVerifyUseCase {
       token,
     });
 
-    console.log('isValid', isValid);
-
     if (!isValid) throw new UnauthorizedException('Invalid MFA token');
 
-    mfa.isActive = true;
+    if (!mfa.isActive) {
+      mfa.isActive = true;
+      await this.mfaRepo.save(mfa);
+    }
 
-    await this.mfaRepo.save(mfa);
+    const jwtPayload = {
+      sub: userId,
+    };
 
-    return { success: true };
+    const accessToken = await this.jwtService.signAsync(jwtPayload, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = await this.jwtService.signAsync(jwtPayload, {
+      expiresIn: '20m',
+    });
+
+    return { accessToken, refreshToken };
   }
 }

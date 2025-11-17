@@ -24,12 +24,13 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { MfaSetupRequestDto } from './dto/mfa-setup-request.dto';
 import { MfaVerifyRequestDto } from './dto/mfa-verify-request.dto';
 import { BaseResponseDto } from '../dto/common/base-response.dto';
-import { ApiResponseOf } from '../dto/common/api-response.dto';
+import { ApiResponseDto, ApiResponseOf } from '../dto/common/api-response.dto';
 
 import { RegisterUserUseCase } from 'src/core/application/auth/use-cases/register-user.use-case';
 import { LoginUserUseCase } from 'src/core/application/auth/use-cases/login-user.use-case';
 import { MfaSetupUseCase } from 'src/core/application/auth/use-cases/mfa-setup.use-case';
 import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify.use-case';
+import { MfaVerifyResponseDto } from './dto/mfa-verify-response';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -49,7 +50,7 @@ export class AuthController {
   })
   async register(
     @Body() dto: RegisterRequestDto,
-  ): Promise<BaseResponseDto<RegisterResponseDto>> {
+  ): Promise<ApiResponseDto<RegisterResponseDto>> {
     console.log(dto);
     const result = await this.registerUserUseCase.execute({
       username: dto.username,
@@ -71,7 +72,7 @@ export class AuthController {
   })
   async login(
     @Body() body: LoginRequestDto,
-  ): Promise<{ message: string; data: LoginResponseDto }> {
+  ): Promise<ApiResponseDto<LoginResponseDto>> {
     const result = await this.loginUserUseCase.execute(body);
 
     return {
@@ -93,12 +94,23 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('mfa/verify')
+  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('mfa-ticket')
-  async verify(@Body() body: MfaVerifyRequestDto, @Request() request) {
-    await this.mfaVerifyUseCase.execute(request.user.id, body.token);
+  @ApiOkResponse({
+    type: ApiResponseOf(MfaVerifyResponseDto),
+  })
+  async verify(
+    @Body() body: MfaVerifyRequestDto,
+    @Request() request,
+  ): Promise<ApiResponseDto<MfaVerifyResponseDto>> {
+    console.log('request user', request.user);
+    const data = await this.mfaVerifyUseCase.execute(
+      request.user.id,
+      body.token,
+    );
     return {
-      message: 'MFA successfully enabled',
-      data: null,
+      message: 'Successfuly Login',
+      data: data,
     };
   }
 }
