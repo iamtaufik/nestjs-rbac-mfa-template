@@ -4,9 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserOrmEntity } from 'src/infrastructure/database/entities/user.orm-entity';
 import { CreateUserUseCase } from 'src/core/application/user/use-case/create-user.use-case';
 import { UserController } from './user.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstant } from 'src/utils/constant';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserOrmEntity])],
+  imports: [TypeOrmModule.forFeature([UserOrmEntity]),
+JwtModule.register({
+      secret: jwtConstant.secret,
+    })],
   controllers: [UserController],
   providers: [CreateUserUseCase],
   exports: [CreateUserUseCase],

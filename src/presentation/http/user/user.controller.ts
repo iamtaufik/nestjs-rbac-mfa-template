@@ -16,6 +16,7 @@ import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { UserResponseDto } from './dto/create-user-response.dto';
 import { CreateUserUseCase } from 'src/core/application/user/use-case/create-user.use-case';
 import { ApiResponseDto, ApiResponseOf } from '../dto/common/api-response.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('User Management')
 @Controller('users')
@@ -29,6 +30,7 @@ export class UserController {
     type: ApiResponseOf(UserResponseDto),
   })
   @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   // @UseGuards(JwtAuthGuard, new RbacGuard(['USER_CREATE'])) // nanti kalau guard RBAC sudah siap
   async create(
     @Body() body: CreateUserRequestDto,
