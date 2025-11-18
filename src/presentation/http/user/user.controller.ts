@@ -29,7 +29,7 @@ export class UserController {
   @ApiCreatedResponse({
     type: ApiResponseOf(UserResponseDto),
   })
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard)
   // @UseGuards(JwtAuthGuard, new RbacGuard(['USER_CREATE'])) // nanti kalau guard RBAC sudah siap
   async create(
