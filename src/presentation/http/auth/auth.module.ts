@@ -15,13 +15,17 @@ import { RegisterUserUseCase } from 'src/core/application/auth/use-cases/registe
 import { LoginUserUseCase } from 'src/core/application/auth/use-cases/login-user.use-case';
 import { MfaSetupUseCase } from 'src/core/application/auth/use-cases/mfa-setup.use-case';
 import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify.use-case';
+import { RbacModule } from 'src/common/rbac/rbac.module';
+import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserOrmEntity, MfaFactorOrmEntity]),
     JwtModule.register({
       secret: jwtConstant.secret,
+      // kalau butuh signOptions bisa ditaruh di sini juga
     }),
+    RbacModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -29,6 +33,7 @@ import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify
     LoginUserUseCase,
     MfaSetupUseCase,
     MfaVerifyUseCase,
+    MeUseCase,
     {
       provide: UserRepositoryToken,
       useClass: UserTypeOrmRepository,

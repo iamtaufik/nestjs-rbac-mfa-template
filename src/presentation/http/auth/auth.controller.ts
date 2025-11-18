@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -15,7 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from '../../../common/guards/auth.guard';
 
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
@@ -31,6 +32,8 @@ import { LoginUserUseCase } from 'src/core/application/auth/use-cases/login-user
 import { MfaSetupUseCase } from 'src/core/application/auth/use-cases/mfa-setup.use-case';
 import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify.use-case';
 import { MfaVerifyResponseDto } from './dto/mfa-verify-response';
+import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
+import { MeResponseDto } from './dto/me-response.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -40,6 +43,7 @@ export class AuthController {
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly mfaSetupUseCase: MfaSetupUseCase,
     private readonly mfaVerifyUseCase: MfaVerifyUseCase,
+    private readonly meUseCase: MeUseCase
   ) {}
 
   @Post('register')
@@ -81,8 +85,8 @@ export class AuthController {
     };
   }
 
-  @UseGuards(AuthGuard)
   @Post('mfa/setup')
+  @UseGuards(AuthGuard)
   @ApiBearerAuth('mfa-ticket')
   async setup(@Request() request) {
     const data = await this.mfaSetupUseCase.execute(request.user.id);
@@ -92,8 +96,8 @@ export class AuthController {
     };
   }
 
-  @UseGuards(AuthGuard)
   @Post('mfa/verify')
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('mfa-ticket')
   @ApiOkResponse({
@@ -112,5 +116,21 @@ export class AuthController {
       message: 'Successfuly Login',
       data: data,
     };
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('access-token')
+  @ApiOkResponse({
+    type: ApiResponseOf(MeResponseDto)
+  })
+  async me(@Request() request): Promise<ApiResponseDto<MeResponseDto>> {
+    const result = await this.meUseCase.execute(request.user.id)
+    
+    return {
+      message: 'Successfuly get Me',
+      data: result
+    }
   }
 }

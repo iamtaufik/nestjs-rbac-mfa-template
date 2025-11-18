@@ -5,7 +5,6 @@ export class ApiResponseDto<T> {
   @ApiProperty()
   message: string;
 
-  // di base boleh tanpa decorator, nanti didefinisikan di subclass
   data: T;
 }
 
@@ -15,11 +14,9 @@ export const ApiResponseOf = <TModel extends Type<unknown>>(model: TModel) => {
     message: string;
 
     @ApiProperty({ type: model })
-    // pakai any di sini supaya swagger happy
     data: any;
   }
 
-  // Bantu swagger: kasih nama yang stabil ke class-nya
   Object.defineProperty(ApiResponseForModel, 'name', {
     value: `ApiResponseOf${model.name}`,
   });

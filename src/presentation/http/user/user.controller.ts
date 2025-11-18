@@ -16,10 +16,14 @@ import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { UserResponseDto } from './dto/create-user-response.dto';
 import { CreateUserUseCase } from 'src/core/application/user/use-case/create-user.use-case';
 import { ApiResponseDto, ApiResponseOf } from '../dto/common/api-response.dto';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../../../common/guards/auth.guard';
+import { RbacGuard } from 'src/common/guards/rbac.guard';
+import { Permissions } from 'src/common/decorators/permission.decorator';
 
 @ApiTags('User Management')
 @Controller('users')
+  @UseGuards(AuthGuard, RbacGuard)
+
 export class UserController {
   constructor(private readonly createUserUseCase: CreateUserUseCase) {}
 
@@ -30,7 +34,7 @@ export class UserController {
     type: ApiResponseOf(UserResponseDto),
   })
   @ApiBearerAuth('access-token')
-  @UseGuards(AuthGuard)
+  @Permissions('USER_CREATE')
   // @UseGuards(JwtAuthGuard, new RbacGuard(['USER_CREATE'])) // nanti kalau guard RBAC sudah siap
   async create(
     @Body() body: CreateUserRequestDto,
