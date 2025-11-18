@@ -9,15 +9,14 @@ import { jwtConstant } from 'src/utils/constant';
 import { RbacModule } from 'src/common/rbac/rbac.module';
 import { UserRoleOrmEntity } from 'src/infrastructure/database/entities/user-role.orm-entity';
 
-
 @Module({
   imports: [
-      TypeOrmModule.forFeature([UserOrmEntity, UserRoleOrmEntity]),
-JwtModule.register({
+    TypeOrmModule.forFeature([UserOrmEntity, UserRoleOrmEntity]),
+    JwtModule.register({
       secret: jwtConstant.secret,
     }),
-    RbacModule
-],
+    RbacModule,
+  ],
   controllers: [UserController],
   providers: [CreateUserUseCase],
   exports: [CreateUserUseCase],

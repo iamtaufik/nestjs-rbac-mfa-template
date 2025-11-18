@@ -17,6 +17,7 @@ import { MfaSetupUseCase } from 'src/core/application/auth/use-cases/mfa-setup.u
 import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify.use-case';
 import { RbacModule } from 'src/common/rbac/rbac.module';
 import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
+import { RefreshTokenUseCase } from 'src/core/application/auth/use-cases/refresh-token.use-case';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
     MfaSetupUseCase,
     MfaVerifyUseCase,
     MeUseCase,
+    RefreshTokenUseCase,
     {
       provide: UserRepositoryToken,
       useClass: UserTypeOrmRepository,

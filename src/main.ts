@@ -31,6 +31,17 @@ async function bootstrap() {
       },
       'access-token',
     )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'refresh-token',
+    )
     .setTitle('Minimal RBAC Authentication')
     .setDescription('API documentation for Auth + RBAC + MFA')
     .setVersion('1.0.0')

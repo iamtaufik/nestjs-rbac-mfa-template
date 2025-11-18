@@ -34,6 +34,7 @@ import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify
 import { MfaVerifyResponseDto } from './dto/mfa-verify-response';
 import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
 import { MeResponseDto } from './dto/me-response.dto';
+import { RefreshTokenUseCase } from 'src/core/application/auth/use-cases/refresh-token.use-case';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -43,7 +44,8 @@ export class AuthController {
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly mfaSetupUseCase: MfaSetupUseCase,
     private readonly mfaVerifyUseCase: MfaVerifyUseCase,
-    private readonly meUseCase: MeUseCase
+    private readonly meUseCase: MeUseCase,
+    private readonly refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
 
   @Post('register')
@@ -55,7 +57,6 @@ export class AuthController {
   async register(
     @Body() dto: RegisterRequestDto,
   ): Promise<ApiResponseDto<RegisterResponseDto>> {
-    console.log(dto);
     const result = await this.registerUserUseCase.execute({
       username: dto.username,
       email: dto.email,
@@ -107,7 +108,6 @@ export class AuthController {
     @Body() body: MfaVerifyRequestDto,
     @Request() request,
   ): Promise<ApiResponseDto<MfaVerifyResponseDto>> {
-    console.log('request user', request.user);
     const data = await this.mfaVerifyUseCase.execute(
       request.user.id,
       body.token,
@@ -118,19 +118,37 @@ export class AuthController {
     };
   }
 
+  @Post('token')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('refresh-token')
+  @ApiOkResponse({
+    type: ApiResponseOf(MfaVerifyResponseDto),
+  })
+  async token(
+    @Request() request,
+  ): Promise<ApiResponseDto<MfaVerifyResponseDto>> {
+    const result = await this.refreshTokenUseCase.execute(request.user.id);
+
+    return {
+      message: 'Successfuly revoke token',
+      data: result,
+    };
+  }
+
   @Get('me')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('access-token')
   @ApiOkResponse({
-    type: ApiResponseOf(MeResponseDto)
+    type: ApiResponseOf(MeResponseDto),
   })
   async me(@Request() request): Promise<ApiResponseDto<MeResponseDto>> {
-    const result = await this.meUseCase.execute(request.user.id)
-    
+    const result = await this.meUseCase.execute(request.user.id);
+
     return {
       message: 'Successfuly get Me',
-      data: result
-    }
+      data: result,
+    };
   }
 }

@@ -26,7 +26,6 @@ export class MfaSetupUseCase {
   ) {}
 
   async execute(userId: string) {
-    console.log('userid', userId);
     const user = await this.userRepo.findOne({
       where: {
         id: userId,

@@ -22,8 +22,7 @@ import { Permissions } from 'src/common/decorators/permission.decorator';
 
 @ApiTags('User Management')
 @Controller('users')
-  @UseGuards(AuthGuard, RbacGuard)
-
+@UseGuards(AuthGuard, RbacGuard)
 export class UserController {
   constructor(private readonly createUserUseCase: CreateUserUseCase) {}
 
