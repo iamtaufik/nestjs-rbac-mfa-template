@@ -61,7 +61,12 @@ async function bootstrap() {
       transform: true, // body plain object -> instance dari DTO
     }),
   );
-
+  app.enableCors({
+    origin: '*', // Replace with your actual frontend domain
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
