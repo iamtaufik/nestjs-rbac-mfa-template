@@ -35,8 +35,10 @@ import { MfaVerifyResponseDto } from './dto/mfa-verify-response';
 import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
 import { MeResponseDto } from './dto/me-response.dto';
 import { RefreshTokenUseCase } from 'src/core/application/auth/use-cases/refresh-token.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('Auth')
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(

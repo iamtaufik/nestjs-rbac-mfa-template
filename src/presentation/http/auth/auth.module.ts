@@ -18,9 +18,26 @@ import { MfaVerifyUseCase } from 'src/core/application/auth/use-cases/mfa-verify
 import { RbacModule } from 'src/common/rbac/rbac.module';
 import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
 import { RefreshTokenUseCase } from 'src/core/application/auth/use-cases/refresh-token.use-case';
+import {
+  ThrottlerGuard,
+  ThrottlerModule,
+  ThrottlerStorage,
+} from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      errorMessage(context, throttlerLimitDetail) {
+        console.log('throttlerLimitDetail', throttlerLimitDetail);
+        return 'Too Many Requests';
+      },
+      throttlers: [
+        {
+          ttl: 6000,
+          limit: 3,
+        },
+      ],
+    }),
     TypeOrmModule.forFeature([UserOrmEntity, MfaFactorOrmEntity]),
     JwtModule.register({
       secret: jwtConstant.secret,
@@ -36,6 +53,7 @@ import { RefreshTokenUseCase } from 'src/core/application/auth/use-cases/refresh
     MfaVerifyUseCase,
     MeUseCase,
     RefreshTokenUseCase,
+    ThrottlerGuard,
     {
       provide: UserRepositoryToken,
       useClass: UserTypeOrmRepository,
