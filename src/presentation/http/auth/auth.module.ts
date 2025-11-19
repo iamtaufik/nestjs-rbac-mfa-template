@@ -23,6 +23,8 @@ import {
   ThrottlerModule,
   ThrottlerStorage,
 } from '@nestjs/throttler';
+import { EmailQueueService } from 'src/infrastructure/queues/jobs/email-queue/email-queue.service';
+import { EmailQueueModule } from 'src/infrastructure/queues/jobs/email-queue/email-queue.modul';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import {
       // kalau butuh signOptions bisa ditaruh di sini juga
     }),
     RbacModule,
+    EmailQueueModule,
   ],
   controllers: [AuthController],
   providers: [

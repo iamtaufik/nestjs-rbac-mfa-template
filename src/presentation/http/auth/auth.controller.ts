@@ -36,6 +36,7 @@ import { MeUseCase } from 'src/core/application/auth/use-cases/me.use-case';
 import { MeResponseDto } from './dto/me-response.dto';
 import { RefreshTokenUseCase } from 'src/core/application/auth/use-cases/refresh-token.use-case';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { EmailQueueService } from 'src/infrastructure/queues/jobs/email-queue/email-queue.service';
 
 @ApiTags('Auth')
 @UseGuards(ThrottlerGuard)
@@ -48,6 +49,7 @@ export class AuthController {
     private readonly mfaVerifyUseCase: MfaVerifyUseCase,
     private readonly meUseCase: MeUseCase,
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
+    private readonly emailQueueService: EmailQueueService,
   ) {}
 
   @Post('register')
@@ -63,6 +65,12 @@ export class AuthController {
       username: dto.username,
       email: dto.email,
       password: dto.password,
+    });
+
+    await this.emailQueueService.enqueueWelcomeEmail({
+      userId: result.id,
+      email: result.email,
+      name: result.username,
     });
 
     return {
