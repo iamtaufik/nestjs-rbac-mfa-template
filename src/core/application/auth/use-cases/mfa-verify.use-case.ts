@@ -5,6 +5,7 @@ import { authenticator } from 'otplib';
 import { JwtService } from '@nestjs/jwt';
 
 import { MfaFactorOrmEntity } from 'src/infrastructure/database/entities/mfa-factor.orm-entity';
+import { UserOrmEntity } from 'src/infrastructure/database/entities/user.orm-entity';
 
 @Injectable()
 export class MfaVerifyUseCase {
@@ -12,10 +13,34 @@ export class MfaVerifyUseCase {
     @InjectRepository(MfaFactorOrmEntity)
     private readonly mfaRepo: Repository<MfaFactorOrmEntity>,
 
+    @InjectRepository(UserOrmEntity)
+    private readonly userRepo: Repository<UserOrmEntity>,
+
     private readonly jwtService: JwtService,
   ) {}
 
   async execute(userId: string, token: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const now = new Date();
+    if (user.freezeUntil && user.freezeUntil > now) {
+      throw new UnauthorizedException(
+        'Account temporarily locked. Please try again later.',
+        {
+          description: user.freezeUntil.toISOString(),
+        },
+      );
+    }
+
+    if (user.freezeUntil && user.freezeUntil <= now) {
+      user.freezeUntil = null;
+      user.failedAttemptCount = 0;
+      await this.userRepo.save(user);
+    }
+
     const mfa = await this.mfaRepo.findOne({
       where: {
         user: {
@@ -33,11 +58,28 @@ export class MfaVerifyUseCase {
       token,
     });
 
-    if (!isValid) throw new UnauthorizedException('Invalid MFA token');
+    if (!isValid) {
+      user.failedAttemptCount = (user.failedAttemptCount ?? 0) + 1;
+
+      if (user.failedAttemptCount >= 5) {
+        const lockDurationMs = 2 * 60 * 1000;
+        user.freezeUntil = new Date(Date.now() + lockDurationMs);
+      }
+
+      await this.userRepo.save(user);
+
+      throw new UnauthorizedException('Invalid MFA token');
+    }
 
     if (!mfa.isActive) {
       mfa.isActive = true;
       await this.mfaRepo.save(mfa);
+    }
+
+    if (user.failedAttemptCount || user.freezeUntil) {
+      user.failedAttemptCount = 0;
+      user.freezeUntil = null;
+      await this.userRepo.save(user);
     }
 
     const jwtPayload = {

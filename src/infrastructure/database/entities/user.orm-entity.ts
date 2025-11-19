@@ -28,6 +28,12 @@ export class UserOrmEntity {
   @Column({ name: 'ISACT', type: 'boolean', default: true })
   isActive: boolean;
 
+  @Column({ name: 'ATTCNT', type: 'int', default: 0 })
+  failedAttemptCount: number;
+
+  @Column({ name: 'FRZUNT', type: 'timestamptz', nullable: true })
+  freezeUntil: Date | null;
+
   @Column({ name: 'CRDAT', type: 'timestamptz', default: () => 'now()' })
   createdAt: Date;
 
