@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 process.env.TZ = 'UTC';
@@ -60,6 +60,17 @@ async function bootstrap() {
       whitelist: true, // hapus field yang tidak ada di DTO (contoh: "awok")
       forbidNonWhitelisted: true, // kalau ada field asing -> langsung error
       transform: true, // body plain object -> instance dari DTO
+      exceptionFactory(validationErrors) {
+        const errors = validationErrors.map((err) => ({
+          field: err.property,
+          constraints: Object.values(err.constraints || {}),
+        }));
+
+        return new BadRequestException({
+          message: 'Validation failed',
+          errors,
+        });
+      },
     }),
   );
   app.enableCors({
