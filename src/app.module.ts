@@ -4,6 +4,7 @@ import { AuthModule } from './presentation/http/auth/auth.module';
 import { UserModule } from './presentation/http/user/user.module';
 import { SchedulerModule } from './infrastructure/scheduling/scheduler.module';
 import { QueueModule } from './infrastructure/queues/queue.module';
+import { RoleModule } from './presentation/http/role/role.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { QueueModule } from './infrastructure/queues/queue.module';
     DatabaseModule,
     AuthModule,
     UserModule,
+    RoleModule,
   ],
   providers: [],
 })
