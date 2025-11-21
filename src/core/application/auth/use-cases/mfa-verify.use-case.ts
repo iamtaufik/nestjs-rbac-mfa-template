@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { authenticator } from 'otplib';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 
 import { MfaFactorOrmEntity } from 'src/infrastructure/database/entities/mfa-factor.orm-entity';
 import { UserOrmEntity } from 'src/infrastructure/database/entities/user.orm-entity';
@@ -86,12 +86,14 @@ export class MfaVerifyUseCase {
       sub: userId,
     };
 
+    // @ts-ignore
     const accessToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: '15m',
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? '15m',
     });
 
+    // @ts-ignore
     const refreshToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: '20m',
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '20m',
     });
 
     return { accessToken, refreshToken };

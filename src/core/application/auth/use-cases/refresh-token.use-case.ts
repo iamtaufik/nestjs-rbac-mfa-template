@@ -10,12 +10,14 @@ export class RefreshTokenUseCase {
       sub: userId,
     };
 
+    // @ts-ignore
     const accessToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: '15m',
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? '15m',
     });
 
+    // @ts-ignore
     const refreshToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: '20m',
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '20m',
     });
 
     return {

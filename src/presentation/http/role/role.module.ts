@@ -9,6 +9,7 @@ import { UserOrmEntity } from 'src/infrastructure/database/entities/user.orm-ent
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstant } from 'src/utils/constant';
 import { DetailRoleUseCase } from 'src/core/application/role/use-case/detail-role.use-case';
+import { CreateRoleUseCase } from 'src/core/application/role/use-case/create-role.use-case';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { DetailRoleUseCase } from 'src/core/application/role/use-case/detail-rol
     RbacModule,
   ],
   controllers: [RoleController],
-  providers: [GetRolesUseCase, DetailRoleUseCase],
-  exports: [GetRolesUseCase, DetailRoleUseCase],
+  providers: [GetRolesUseCase, DetailRoleUseCase, CreateRoleUseCase],
+  exports: [GetRolesUseCase, DetailRoleUseCase, CreateRoleUseCase],
 })
 export class RoleModule {}
