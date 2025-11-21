@@ -12,15 +12,8 @@ import { DetailRoleUseCase } from 'src/core/application/role/use-case/detail-rol
 import { CreateRoleUseCase } from 'src/core/application/role/use-case/create-role.use-case';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserOrmEntity, UserRoleOrmEntity, RoleOrmEntity]),
-    JwtModule.register({
-      secret: jwtConstant.secret,
-    }),
-    RbacModule,
-  ],
+  imports: [TypeOrmModule.forFeature([RoleOrmEntity]), RbacModule],
   controllers: [RoleController],
   providers: [GetRolesUseCase, DetailRoleUseCase, CreateRoleUseCase],
-  exports: [GetRolesUseCase, DetailRoleUseCase, CreateRoleUseCase],
 })
 export class RoleModule {}

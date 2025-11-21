@@ -19,6 +19,5 @@ import { UserRoleOrmEntity } from 'src/infrastructure/database/entities/user-rol
   ],
   controllers: [UserController],
   providers: [CreateUserUseCase],
-  exports: [CreateUserUseCase],
 })
 export class UserModule {}

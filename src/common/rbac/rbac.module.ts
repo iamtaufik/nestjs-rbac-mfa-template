@@ -1,6 +1,4 @@
-// src/common/rbac/rbac.module.ts
-import { Global, Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RolePermissionOrmEntity } from 'src/infrastructure/database/entities/role-perm.orm-entity';
@@ -22,5 +20,6 @@ import { RbacGuard } from '../guards/rbac.guard';
     }),
   ],
   providers: [AuthGuard, RbacGuard],
+  exports: [AuthGuard, RbacGuard, TypeOrmModule, JwtModule],
 })
 export class RbacModule {}
