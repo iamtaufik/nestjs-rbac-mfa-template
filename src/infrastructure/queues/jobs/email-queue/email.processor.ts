@@ -1,17 +1,22 @@
 import { Logger } from '@nestjs/common';
 import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
+import { MailService } from 'src/infrastructure/mail/mail.service';
 
 @Processor('email')
 export class EmailProcessor extends WorkerHost {
   private readonly logger = new Logger(EmailProcessor.name);
+
+  constructor(private readonly mailService: MailService) {
+    super();
+  }
 
   async process(job: Job<any, any, string>, token?: string): Promise<any> {
     this.logger.log(`Processing job ${job.id} (${job.name})`);
 
     switch (job.name) {
       case 'send-welcome-email':
-        await this.handleWelcomeEmail(job.data);
+        await this.mailService.sendWelcomeEmail(job.data.email, job.data.name);
         break;
 
       default:
