@@ -14,6 +14,7 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    console.log('E2E Test App Initialized');
   });
 
   it('/ (GET)', () => {
