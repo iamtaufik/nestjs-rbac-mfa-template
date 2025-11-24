@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { EmailQueueModule } from './jobs/email-queue/email-queue.modul';
