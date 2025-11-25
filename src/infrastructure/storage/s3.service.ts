@@ -10,7 +10,6 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
 
-
 @Injectable()
 export class S3Service {
   private readonly logger = new Logger(S3Service.name);

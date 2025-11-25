@@ -23,7 +23,7 @@ import { FileModule } from './presentation/http/files/file.module';
     UserModule,
     RoleModule,
     PermissionModule,
-    FileModule
+    FileModule,
   ],
   providers: [],
 })

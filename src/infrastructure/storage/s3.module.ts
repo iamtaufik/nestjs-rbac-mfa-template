@@ -20,7 +20,7 @@ import { S3Service } from './s3.service';
       },
       inject: [ConfigService],
     },
-    S3Service
+    S3Service,
   ],
   exports: ['S3_CLIENT', S3Service],
 })
